@@ -1,61 +1,7 @@
-import Link from "next/link";
-import Image from "next/image";
 import { getDictionary } from "~/lib/get-dictionary";
-
-import { CodeCopy } from "~/components/code-copy";
-import { Comments } from "~/components/comments";
-import { FeaturesGrid } from "~/components/features-grid";
-import { RightsideMarketing } from "~/components/rightside-marketing";
-
-import { AnimatedTooltip } from "@saasfly/ui/animated-tooltip";
-import { BackgroundLines } from "@saasfly/ui/background-lines";
 import { Button } from "@saasfly/ui/button";
-import { ColourfulText } from "@saasfly/ui/colorful-text";
-import * as Icons from "@saasfly/ui/icons";
-
+import Link from "next/link";
 import type { Locale } from "~/config/i18n-config";
-import {VideoScroll} from "~/components/video-scroll";
-
-const people = [
-  {
-    id: 1,
-    name: "tianzx",
-    designation: "CEO at Nextify",
-    image: "https://avatars.githubusercontent.com/u/10096899",
-    link: "https://x.com/nextify2024",
-  },
-  {
-    id: 2,
-    name: "jackc3",
-    designation: "Co-founder at Nextify",
-    image: "https://avatars.githubusercontent.com/u/10334353",
-    link: "https://x.com/BingxunYao",
-  },
-  {
-    id: 3,
-    name: "imesong",
-    designation: "Contributor",
-    image: "https://avatars.githubusercontent.com/u/3849293",
-  },
-  {
-    id: 4,
-    name: "ziveen",
-    designation: "Contributor",
-    image: "https://avatars.githubusercontent.com/u/22560152",
-  },
-  {
-    id: 5,
-    name: "Zenuncl",
-    designation: "Independent Software Developer",
-    image: "https://avatars.githubusercontent.com/u/3316062",
-  },
-  {
-    id: 6,
-    name: "Innei",
-    designation: "Indie Developer",
-    image: "https://avatars.githubusercontent.com/u/41265413",
-  },
-];
 
 export default async function IndexPage({
   params: { lang },
@@ -66,117 +12,154 @@ export default async function IndexPage({
 }) {
   const dict = await getDictionary(lang);
 
+  const tools = [
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      ),
+      title: dict.image_prompt.image_to_prompt,
+      description: dict.image_prompt.image_to_prompt_desc
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      ),
+      title: dict.image_prompt.magic_enhance,
+      description: dict.image_prompt.magic_enhance_desc
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+      ),
+      title: dict.image_prompt.ai_describe_image,
+      description: dict.image_prompt.ai_describe_image_desc
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        </svg>
+      ),
+      title: dict.image_prompt.ai_image_generator,
+      description: dict.image_prompt.ai_image_generator_desc
+    }
+  ];
+
   return (
-    <>
-      <section className="container">
-        <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
-          <div className="flex flex-col items-start h-full">
-            <BackgroundLines className="h-full">
-              <div className="flex flex-col pt-4 md:pt-36 lg:pt-36 xl:pt-36">
-                <div className="mt-20">
-                  <div
-                    className="mb-6 max-w-4xl text-left text-4xl font-semibold dark:text-zinc-100 md:text-5xl xl:text-5xl md:leading-[4rem] xl:leading-[4rem]">
-                    {dict.marketing.title || "Ship your apps to the world easier with "}
-                    <ColourfulText text="Saasfly"/>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
+      {/* Navigation */}
+      <nav className="bg-white border-b border-gray-200 fixed w-full top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <span className="text-purple-600 text-xl font-bold">ImagePrompt.org</span>
+            </div>
 
-                <div className="mt-4">
-                  <span className="text-neutral-500 dark:text-neutral-400 sm:text-lg">
-                    {dict.marketing.sub_title || "Your complete All-in-One solution for building SaaS services."}
-                  </span>
-                </div>
-
-                <div
-                  className="mb-4 mt-6 flex w-full flex-col justify-center space-y-4 sm:flex-row sm:justify-start sm:space-x-8 sm:space-y-0 z-10">
-                  <Link href="https://github.com/saasfly/saasfly" target="_blank">
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-full text-lg px-6 h-12 font-medium">
-                      {dict.marketing.get_started}
-                      <Icons.ArrowRight className="h-5 w-5"/>
-                    </Button>
-                  </Link>
-
-                  <CodeCopy/>
-                </div>
-
-                <div className="flex xl:flex-row flex-col items-center justify-start mt-4 w-full">
-                  <div className="flex">
-                    <AnimatedTooltip items={people}/>
-                  </div>
-                  <div className="flex flex-col items-center justify-start ml-8">
-                    <div className="w-[340px]">
-                      <span className="font-semibold">9 </span>
-                      <span className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.contributors_desc}</span>
-                    </div>
-                    <div className="w-[340px]">
-                      <span
-                        className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.developers_first}</span>
-                      <ColourfulText text="2000"/>
-                      <span
-                        className="text-neutral-500 dark:text-neutral-400">{dict.marketing.contributors.developers_second}</span>
-                    </div>
-                  </div>
-                </div>
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center space-x-8">
+              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.home}</button>
+              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.inspiration}</button>
+              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.tutorials}</button>
+              <div className="relative group">
+                <button className="text-gray-700 hover:text-purple-600 font-medium flex items-center">
+                  {dict.marketing.tools}
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
               </div>
-            </BackgroundLines>
-          </div>
+              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.main_nav_pricing}</button>
+            </div>
 
-          <div className="hidden h-full w-full xl:block bg-background">
-            <div className="flex flex-col pt-44">
-              <RightsideMarketing dict={dict.marketing.right_side}/>
+            {/* Right Side */}
+            <div className="flex items-center space-x-4">
+              <Link href={`/${lang}/login`}>
+                <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.login}</button>
+              </Link>
+              <div className="text-sm text-gray-600">
+                {lang === 'zh' ? (
+                  <>Switch to English? <Link href="/en" className="text-purple-600 cursor-pointer hover:underline">YES</Link></>
+                ) : (
+                  <>切换到简体中文? <Link href="/zh" className="text-purple-600 cursor-pointer hover:underline">YES</Link></>
+                )}
+              </div>
             </div>
           </div>
         </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            {dict.marketing.create_better_ai_art}
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            {dict.marketing.inspire_ideas}. {dict.marketing.enhance_prompts}. {dict.marketing.create_masterpieces}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href={`/${lang}/image-to-prompt`}>
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-lg">
+                {dict.marketing.try_now}
+              </Button>
+            </Link>
+            <Button className="bg-white border-purple-600 text-purple-600 hover:bg-purple-50 px-8 py-3 text-lg font-semibold rounded-lg">
+              {dict.marketing.tutorials}
+            </Button>
+          </div>
+        </div>
       </section>
 
-      <section className="container mt-8 md:mt-[-180px] xl:mt-[-180px]">
-        <FeaturesGrid dict={dict.marketing.features_grid}/>
-      </section>
-
-      <section className="container pt-24">
-        <div className="flex flex-col justify-center items-center pt-10">
-          <div className="text-lg text-neutral-500 dark:text-neutral-400">{dict.marketing.sponsor.title}</div>
-          <div className="mt-4 flex items-center gap-4">
-            <Link href="https://go.clerk.com/uKDp7Au" target="_blank">
-              <Image src="/images/clerk.png" width="48" height="48" alt="twillot"/>
-            </Link>
-            <Link href="https://www.twillot.com/" target="_blank">
-              <Image src="https://www.twillot.com/logo-128.png" width="48" height="48" alt="twillot"/>
-            </Link>
-            <Link href="https://www.setupyourpay.com/" target="_blank">
-              <Image src="https://www.setupyourpay.com/logo.png" width="48" height="48" alt="setupyourpay" />
-            </Link>
-            <Link href="https://opencollective.com/saasfly" target="_blank">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:bg-accent dark:hover:bg-neutral-800/30">
-                <Icons.Heart className="w-5 h-5 fill-pink-600 text-pink-600 dark:fill-pink-700 dark:text-pink-700" />
-                <span className="text-sm font-medium text-neutral-500 dark:text-neutral-200">{dict.marketing.sponsor.donate || ''}</span>
+      {/* Tools Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {tools.map((tool, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-purple-600 mb-4">
+                  {tool.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{tool.title}</h3>
+                <p className="text-gray-600">{tool.description}</p>
               </div>
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="container pt-8">
-        <VideoScroll dict={dict.marketing.video}/>
-      </section>
-
-      <section className="w-full px-8 pt-10 sm:px-0 sm:pt-24 md:px-0 md:pt-24 xl:px-0 xl:pt-24">
-        <div className="flex h-full w-full flex-col items-center pb-[100px] pt-10">
-          <div>
-            <h1 className="mb-6 text-center text-3xl font-bold dark:text-zinc-100 md:text-5xl">
-              {dict.marketing.people_comment.title}
-            </h1>
-          </div>
-          <div className="mb-6 text-lg text-neutral-500 dark:text-neutral-400">
-            {dict.marketing.people_comment.desc}
-          </div>
-
-          <div className="w-full overflow-x-hidden">
-            <Comments/>
+      {/* Related Links Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto text-center">
+          <p className="text-lg text-gray-700 mb-6">{dict.marketing.you_may_be_interested_in}</p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <button className="text-purple-600 hover:text-purple-700 text-lg font-medium underline">
+              {dict.marketing.what_is_image_prompt}
+            </button>
+            <button className="text-purple-600 hover:text-purple-700 text-lg font-medium underline">
+              {dict.marketing.how_to_write_prompt}
+            </button>
           </div>
         </div>
       </section>
-    </>
+
+      {/* Bottom Information Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            {dict.marketing.ai_powered_image_tools}
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            {dict.marketing.ai_tools_description}
+          </p>
+        </div>
+      </section>
+    </div>
   );
 }

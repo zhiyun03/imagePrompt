@@ -37,6 +37,21 @@
     "main_nav_documentation": "Documentation",
     "login": "Login",
     "signup": "Sign up",
+    "home": "Home",
+    "inspiration": "Inspiration",
+    "tutorials": "Tutorials",
+    "tools": "Tools",
+    "try_now": "Try now!",
+    "pricing": "Pricing",
+    "what_is_image_prompt": "What is an Image Prompt?",
+    "how_to_write_prompt": "How to Write Effective Image Prompt?",
+    "you_may_be_interested_in": "You may be interested in:",
+    "ai_powered_image_tools": "AI Powered Image Prompt Tools",
+    "ai_tools_description": "A complete suite of AI tools covering every aspect of your image creation journey",
+    "create_better_ai_art": "Create Better AI Art with Image Prompt",
+    "inspire_ideas": "Inspire ideas",
+    "enhance_prompts": "Enhance image prompt",
+    "create_masterpieces": "Create masterpieces",
     "": "",
     "contributors": {
       "contributors_desc": "contributors made Saasfly stronger",
@@ -73,7 +88,7 @@
     },
     "people_comment": {
       "title": "What People Are Saying",
-      "desc": "Don’t just take our word for it. Here’s what real people are saying about Saasfly."
+      "desc": "Don't just take our word for it. Here's what real people are saying about Saasfly."
     }
   },
   "login": {
@@ -123,5 +138,31 @@
     "settings": "Settings",
     "sign_out": "Sign out",
     "": ""
+  },
+  "image_prompt": {
+    "title": "Image to Prompt Generator",
+    "subtitle": "Convert your images into detailed AI prompts to generate similar stunning visuals",
+    "upload_image": "Upload Image",
+    "generated_prompt": "Generated Prompt",
+    "prompt_will_appear_here": "Your generated AI prompt will appear here...",
+    "drop_image_here": "Drop your image here or click to upload",
+    "png_jpg_gif_up_to_10mb": "PNG, JPG, GIF up to 10MB",
+    "choose_file": "Choose File",
+    "generate_prompt": "Generate Prompt",
+    "copy_to_clipboard": "Copy to Clipboard",
+    "detailed_analysis": "Detailed Analysis",
+    "detailed_analysis_desc": "Our AI analyzes every aspect of your image to create comprehensive prompts",
+    "instant_results": "Instant Results",
+    "instant_results_desc": "Get high-quality prompts in seconds, not minutes",
+    "privacy_first": "Privacy First",
+    "privacy_first_desc": "Your images are processed securely and never stored on our servers",
+    "image_to_prompt": "Image to Prompt",
+    "image_to_prompt_desc": "Convert Image to Prompt to generate your own image",
+    "magic_enhance": "Magic Enhance",
+    "magic_enhance_desc": "Transform simple text into detailed, descriptive image prompt",
+    "ai_describe_image": "AI Describe Image",
+    "ai_describe_image_desc": "Let AI help you understand and analyze any image in detail",
+    "ai_image_generator": "AI Image Generator",
+    "ai_image_generator_desc": "Transform your image prompt into stunning visuals with AI-powered generation"
   }
 }

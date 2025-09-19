@@ -19,7 +19,9 @@ const isPublicRoute = (pathname: string) => {
     new RegExp("/(\\w{2}/)?docs(.*)"),
     new RegExp("/(\\w{2}/)?blog(.*)"),
     new RegExp("/(\\w{2}/)?pricing(.*)"),
+    new RegExp("/(\\w{2}/)?image-to-prompt(.*)"), // Image to prompt tool is public
     new RegExp("^/\\w{2}$"), // root with locale
+    new RegExp("^/$"), // root without locale
   ];
   return publicRoutes.some(route => route.test(pathname));
 };
