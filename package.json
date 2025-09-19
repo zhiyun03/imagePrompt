@@ -1,5 +1,18 @@
 {
   "name": "nextjs-template",
+  "devDependencies": {
+    "@turbo/gen": "1.13.3",
+    "check-dependency-version-consistency": "4.1.0",
+    "prettier": "3.2.5",
+    "tailwind-config-viewer": "^2.0.4",
+    "turbo": "1.13.3",
+    "typescript": "5.4.5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "bun@v1.1.10",
+  "prettier": "@saasfly/prettier-config",
   "private": true,
   "scripts": {
     "build": "turbo build ",
@@ -17,25 +30,13 @@
     "check-deps": "check-dependency-version-consistency .",
     "gen": "turbo gen --config 'turbo/generators/config.ts'"
   },
-  "devDependencies": {
-    "@turbo/gen": "1.13.3",
-    "check-dependency-version-consistency": "4.1.0",
-    "prettier": "3.2.5",
-    "tailwind-config-viewer": "^2.0.4",
-    "turbo": "1.13.3",
-    "typescript": "5.4.5"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "prettier": "@saasfly/prettier-config",
   "workspaces": [
     "apps/*",
     "packages/*",
     "tooling/*"
   ],
-  "packageManager": "bun@v1.1.10",
   "dependencies": {
-    "@clerk/nextjs": "^6.20.0"
+    "@auth/kysely-adapter": "1.10.0",
+    "next-auth": "4.24.7"
   }
 }

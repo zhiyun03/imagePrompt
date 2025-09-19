@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { User } from "@saasfly/auth";
+import { signOut, useSession } from "next-auth/react";
 
 import {
   DropdownMenu,
@@ -11,7 +14,7 @@ import {
 
 import { UserAvatar } from "~/components/user-avatar";
 
-interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
+interface UserAccountNavClientProps extends React.HTMLAttributes<HTMLDivElement> {
   user: Pick<User, "name" | "image" | "email">;
   params: {
     lang: string;
@@ -19,11 +22,13 @@ interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
   dict: Record<string, string>;
 }
 
-export function UserAccountNav({
+export function UserAccountNavClient({
   user,
   params: { lang },
   dict,
-}: UserAccountNavProps) {
+}: UserAccountNavClientProps) {
+  const { data: session } = useSession();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -54,8 +59,17 @@ export function UserAccountNav({
           <Link href={`/${lang}/dashboard/settings`}>{dict.settings}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href={`/${lang}/login`}>{dict.sign_out}</Link>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={(event) => {
+            event.preventDefault();
+            signOut({ callbackUrl: `/${lang}/login` })
+              .catch((error) => {
+                console.error("Error during sign out:", error);
+              })
+          }}
+        >
+          {dict.sign_out}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
