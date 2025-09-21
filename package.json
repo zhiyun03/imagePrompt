@@ -37,6 +37,7 @@
   ],
   "dependencies": {
     "@auth/kysely-adapter": "1.10.0",
+    "lucide-react": "^0.544.0",
     "next-auth": "4.24.7"
   }
 }

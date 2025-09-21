@@ -8,7 +8,7 @@ import { env } from "@saasfly/auth/env.mjs";
 
 const noNeedProcessRoute = [".*\\.png", ".*\\.jpg", ".*\\.opengraph-image.png"];
 
-const noRedirectRoute = ["/api(.*)", "/trpc(.*)", "/admin"];
+const noRedirectRoute = ["/api(.*)", "/trpc(.*)", "/admin", "/api/coze(.*)"];
 
 const isPublicRoute = (pathname: string) => {
   const publicRoutes = [
@@ -46,13 +46,13 @@ export function isNoNeedProcess(request: NextRequest): boolean {
 
 export default withAuth(
   async function middleware(req: NextRequest) {
-    if (isNoNeedProcess(req)) {
-      return null;
+    // Skip middleware for our API routes to avoid authentication issues
+    if (req.nextUrl.pathname.startsWith("/api/coze/") || req.nextUrl.pathname.startsWith("/api/webhooks/")) {
+      return NextResponse.next();
     }
 
-    const isWebhooksRoute = req.nextUrl.pathname.startsWith("/api/webhooks/");
-    if (isWebhooksRoute) {
-      return NextResponse.next();
+    if (isNoNeedProcess(req)) {
+      return null;
     }
 
     const pathname = req.nextUrl.pathname;
@@ -121,6 +121,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname;
+
+        // Skip auth check for our API routes
+        if (pathname.startsWith("/api/coze/") || pathname.startsWith("/api/webhooks/")) {
+          return true;
+        }
 
         // Allow public routes
         if (isPublicRoute(pathname)) {
