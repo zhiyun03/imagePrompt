@@ -4,6 +4,7 @@
   "installCommand": "bun install",
   "outputDirectory": "apps/nextjs/.next",
   "framework": "nextjs",
+  "nodeVersion": "22.x",
   "regions": ["sin1"],
   "cleanUrls": true,
   "trailingSlash": false

@@ -2,6 +2,7 @@
   "name": "@saasfly/prettier-config",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "main": "index.mjs",
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
