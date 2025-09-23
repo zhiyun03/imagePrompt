@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
+    "./root": "./src/root.ts",
     "./env": "./src/env.mjs",
     "./edge": "./src/edge.ts",
     "./lambda": "./src/lambda.ts",

@@ -57,8 +57,17 @@ function generateSubscriptionMessage(
 }
 
 async function SubscriptionCard({ dict }: { dict: Record<string, string> }) {
-  const subscription = (await trpc.auth.mySubscription.query()) as Subscription;
-  const content = generateSubscriptionMessage(dict, subscription);
+  let subscription: Subscription | null = null;
+
+  try {
+    subscription = (await trpc.auth.mySubscription.query()) as Subscription;
+  } catch (error) {
+    console.error("Failed to fetch subscription:", error);
+    // 如果数据库不可用，显示没有订阅
+  }
+
+  const content = subscription ? generateSubscriptionMessage(dict, subscription) : "";
+
   return (
     <Card>
       <CardHeader>

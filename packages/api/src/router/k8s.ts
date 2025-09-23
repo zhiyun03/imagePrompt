@@ -21,13 +21,19 @@ export const k8sRouter = createTRPCRouter({
     const user = await getCurrentUser();
     const userId = opts.ctx.userId! as string;
     if (!user) {
-      return;
+      return [];
     }
-    return await db
-      .selectFrom("K8sClusterConfig")
-      .selectAll()
-      .where("authUserId", "=", userId)
-      .execute();
+
+    try {
+      return await db
+        .selectFrom("K8sClusterConfig")
+        .selectAll()
+        .where("authUserId", "=", userId)
+        .execute();
+    } catch (error) {
+      console.error("Database connection error in getClusters:", error);
+      return [];
+    }
   }),
   createCluster: protectedProcedure
     .input(k8sClusterCreateSchema)
