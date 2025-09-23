@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bun --filter nextjs run build",
+  "buildCommand": "cd ./apps/nextjs && bun run build",
   "installCommand": "bun install",
   "framework": "nextjs",
   "functions": {
