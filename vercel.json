@@ -1,5 +1,19 @@
 {
-  "github": {
-    "silent": true
-  }
+  "buildCommand": "cd apps/nextjs && bun run build",
+  "installCommand": "bun install",
+  "framework": "nextjs",
+  "functions": {
+    "app/**/*.{js,ts}": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "builds": [
+    {
+      "src": "apps/nextjs/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
