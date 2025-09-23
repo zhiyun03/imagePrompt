@@ -1,5 +1,4 @@
 {
-  "extends": "@saasfly/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -10,23 +9,25 @@
         "./.contentlayer/generated"
       ]
     },
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve"
+    ]
   },
   "include": [
     "next-env.d.ts",
