@@ -1,4 +1,5 @@
 {
-  "buildCommand": "./vercel-build-inline.sh",
-  "outputDirectory": "apps/nextjs/.next"
+  "github": {
+    "silent": true
+  }
 }

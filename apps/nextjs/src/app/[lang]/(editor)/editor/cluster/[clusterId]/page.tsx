@@ -8,18 +8,12 @@ import { ClusterConfig } from "~/components/k8s/cluster-config";
 import type { Cluster } from "~/types/k8s";
 
 async function getClusterForUser(clusterId: Cluster["id"], userId: User["id"]) {
-  try {
-    return await db
-      .selectFrom("K8sClusterConfig")
-      .selectAll()
-      .where("id", "=", Number(clusterId))
-      .where("authUserId", "=", userId)
-      .executeTakeFirst();
-  } catch (error) {
-    // 如果数据库不可用，返回 null
-    console.error("Database connection error:", error);
-    return null;
-  }
+  return await db
+    .selectFrom("K8sClusterConfig")
+    .selectAll()
+    .where("id", "=", Number(clusterId))
+    .where("authUserId", "=", userId)
+    .executeTakeFirst();
 }
 
 interface EditorClusterProps {
@@ -32,13 +26,7 @@ interface EditorClusterProps {
 export default async function EditorClusterPage({
   params,
 }: EditorClusterProps) {
-  let user = null;
-  try {
-    user = await getCurrentUser();
-  } catch (error) {
-    console.error("Failed to get current user:", error);
-  }
-
+  const user = await getCurrentUser();
   if (!user) {
     redirect(authOptions?.pages?.signIn ?? "/login-clerk");
   }

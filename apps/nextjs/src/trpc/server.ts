@@ -10,6 +10,7 @@ import { observable } from "@trpc/server/observable";
 import { callProcedure } from "@trpc/server";
 import { TRPCErrorResponse } from "@trpc/server/rpc";
 import { cache } from "react";
+import { appRouter } from "../../../../packages/api/src/root";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@saasfly/auth";
 
@@ -61,9 +62,7 @@ export const trpc = createTRPCProxyClient<AppRouter>({
       ({op}) =>
         observable((observer) => {
           createContext()
-            .then(async (ctx) => {
-              // 动态导入 appRouter，避免构建时连接数据库
-              const { appRouter } = await import("@saasfly/api/root");
+            .then((ctx) => {
               return callProcedure({
                 procedures: appRouter._def.procedures,
                 path: op.path,

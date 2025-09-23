@@ -8,22 +8,16 @@ export const authRouter = createTRPCRouter({
   mySubscription: protectedProcedure.query(async (opts) => {
     noStore();
     const userId = opts.ctx.userId as string;
+    const customer = await db
+      .selectFrom("Customer")
+      .select(["plan", "stripeCurrentPeriodEnd"])
+      .where("authUserId", "=", userId)
+      .executeTakeFirst();
 
-    try {
-      const customer = await db
-        .selectFrom("Customer")
-        .select(["plan", "stripeCurrentPeriodEnd"])
-        .where("authUserId", "=", userId)
-        .executeTakeFirst();
-
-      if (!customer) return null;
-      return {
-        plan: customer.plan,
-        endsAt: customer.stripeCurrentPeriodEnd,
-      };
-    } catch (error) {
-      console.error("Database connection error in mySubscription:", error);
-      return null;
-    }
+    if (!customer) return null;
+    return {
+      plan: customer.plan,
+      endsAt: customer.stripeCurrentPeriodEnd,
+    };
   }),
 });
