@@ -81,10 +81,14 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@saasfly/eslint-config/base",
-      "@saasfly/eslint-config/nextjs",
-      "@saasfly/eslint-config/react"
+      "next/core-web-vitals",
+      "plugin:react/recommended"
     ]
   },
-  "prettier": "@saasfly/prettier-config"
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  }
 }
