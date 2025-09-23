@@ -6,7 +6,6 @@
     ".": "./src/index.ts",
     "./env": "./src/env.mjs",
     "./edge": "./src/edge.ts",
-    "./lambda": "./src/lambda.ts",
     "./transformer": "./src/transformer.ts",
     "./resend": "./src/email.ts",
     "./MagicLinkEmail": "./src/emails/magic-link-email.tsx",

@@ -4,8 +4,7 @@ import {fetchRequestHandler} from "@trpc/server/adapters/fetch";
 import {createTRPCContext} from "@saasfly/api";
 import {edgeRouter} from "@saasfly/api/edge";
 
-// 暂时禁用 edge runtime 以解决构建问题
-// export const runtime = "edge";
+export const runtime = "edge";
 
 const createContext = async (req: NextRequest) => {
     try {
