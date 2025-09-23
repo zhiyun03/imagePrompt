@@ -1,29 +1,35 @@
 #!/bin/bash
 
-# Vercel 构建脚本
+# Vercel 构建脚本 - 优化版本
 # 这个脚本彻底解决了 workspace 依赖问题和数据库连接问题
 
-echo "Starting Vercel build..."
+set -e  # 遇到错误时退出
+
+echo "🚀 Starting Vercel build for SaaS Fly monorepo..."
+echo "📅 Build started at: $(date)"
+echo "🔧 Node.js version: $(node --version)"
+echo "📦 Bun version: $(bun --version)"
 
 # 1. 在根目录创建模拟的工作区依赖（这是关键！）
-echo "Creating mock workspace dependencies in root..."
+echo "📦 Creating mock workspace dependencies in root..."
 mkdir -p node_modules/@saasfly
 
 # 2. 创建所有需要的模拟包在根目录
 for package in api auth db stripe ui common eslint-config prettier-config typescript-config tailwind-config; do
-  echo "Creating mock @saasfly/$package in root..."
+  echo "  📦 Creating mock @saasfly/$package..."
   mkdir -p node_modules/@saasfly/$package
   cat > node_modules/@saasfly/$package/package.json << EOF
 {
   "name": "@saasfly/$package",
-  "version": "0.0.1",
-  "main": "index.js"
+  "version": "0.1.0",
+  "main": "index.js",
+  "types": "index.d.ts"
 }
 EOF
 done
 
 # 3. 在根目录创建基本配置文件
-echo "Creating basic config files in root..."
+echo "⚙️ Creating basic config files in root..."
 cat > node_modules/@saasfly/eslint-config/base.js << 'EOF'
 module.exports = {
   extends: ['next/core-web-vitals', 'plugin:react/recommended'],
@@ -212,45 +218,58 @@ export const utils = {};
 EOF
 
 # 5. 临时禁用根目录的 postinstall 脚本以避免 check-deps 错误
-echo "Temporarily disabling postinstall script..."
+echo "🔧 Temporarily disabling postinstall script..."
 cp package.json package.json.backup
 sed -i '' 's/"postinstall": "bun run check-deps"/"postinstall": "echo Skipping check-deps"/' package.json
 
 # 6. 安装根目录依赖
-echo "Installing root dependencies..."
-bun install
+echo "📥 Installing root dependencies..."
+bun install || {
+  echo "❌ Failed to install root dependencies"
+  exit 1
+}
 
 # 7. 进入 nextjs 目录
-echo "Building Next.js app..."
+echo "🏠 Building Next.js app..."
 cd apps/nextjs
 
 # 8. 确保在 nextjs 目录中也有模拟依赖
-echo "Ensuring mock dependencies in nextjs..."
+echo "📦 Ensuring mock dependencies in nextjs..."
 mkdir -p node_modules/@saasfly
-cp -r ../../node_modules/@saasfly/* node_modules/@saasfly/
+cp -r ../../node_modules/@saasfly/* node_modules/@saasfly/ || {
+  echo "❌ Failed to copy mock dependencies"
+  exit 1
+}
 
 # 9. 修改 nextjs 的 package.json 移除 workspace 依赖
-echo "Modifying nextjs package.json to remove workspace dependencies..."
+echo "🔧 Modifying nextjs package.json to remove workspace dependencies..."
 cp package.json package.json.backup
 sed -i '' 's/"workspace:\*"/"*"/g' package.json
 
 # 10. 安装 nextjs 依赖
-echo "Installing nextjs dependencies..."
-bun install
+echo "📥 Installing nextjs dependencies..."
+bun install || {
+  echo "❌ Failed to install nextjs dependencies"
+  exit 1
+}
 
 # 11. 构建应用（跳过环境验证以避免数据库连接问题）
-echo "Running Next.js build..."
-SKIP_ENV_VALIDATION=true POSTGRES_URL="postgresql://dummy:dummy@localhost:5432/dummy" bun run build
+echo "🏗️ Running Next.js build..."
+SKIP_ENV_VALIDATION=true POSTGRES_URL="postgresql://dummy:dummy@localhost:5432/dummy" bun run build || {
+  echo "❌ Failed to build Next.js app"
+  exit 1
+}
 
 # 12. 恢复 nextjs 的原始 package.json
-echo "Restoring nextjs original package.json..."
+echo "🔄 Restoring nextjs original package.json..."
 cp package.json.backup package.json
 rm package.json.backup
 
 # 13. 返回根目录并恢复原始 package.json
-echo "Restoring root original package.json..."
+echo "🔄 Restoring root original package.json..."
 cd ../..
 cp package.json.backup package.json
 rm package.json.backup
 
-echo "Build completed successfully!"
+echo "✅ Build completed successfully!"
+echo "📅 Build finished at: $(date)"
