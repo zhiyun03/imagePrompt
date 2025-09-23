@@ -8,7 +8,7 @@
 ### 1. 构建设置
 在 Vercel 项目设置中配置：
 - **Framework**: Next.js
-- **Build Command**: `./vercel-build.sh`
+- **Build Command**: `./vercel-build-inline.sh`
 - **Output Directory**: `apps/nextjs/.next`
 - **Install Command**: 留空（由构建脚本处理）
 - **Node.js Version**: 20.x
@@ -148,10 +148,35 @@ bun update package-name
 - 监控应用性能和错误
 - 检查数据库连接和性能
 
+## 技术方案说明
+
+### 内联配置方案
+本方案使用内联配置来解决 Vercel 环境下的 workspace 依赖问题：
+
+- **tsconfig.vercel.json**: 内联 TypeScript 配置，避免依赖 @saasfly/typescript-config
+- **tailwind.config.vercel.ts**: 内联 Tailwind 配置，避免依赖 @saasfly/tailwind-config
+- **.eslintrc.vercel.json**: 内联 ESLint 配置，避免依赖 @saasfly/eslint-config
+- **.prettierrc.vercel.json**: 内联 Prettier 配置，避免依赖 @saasfly/prettier-config
+- **vercel-build-inline.sh**: 智能构建脚本，自动替换配置文件
+
+### 构建流程
+1. 备份原始配置文件
+2. 替换为 Vercel 专用配置
+3. 移除 package.json 中的 workspace 依赖
+4. 安装依赖并构建
+5. 恢复原始配置文件
+
+### 优势
+- 保持本地开发体验不变
+- 完全解决 workspace 依赖问题
+- 自动化配置管理
+- 错误恢复机制
+
 ## 技术支持
 
 如遇问题，请：
 1. 检查 Vercel 构建日志
 2. 查看浏览器控制台错误
 3. 验证环境变量配置
-4. 检查 GitHub Issues 或创建新 Issue
+4. 检查构建脚本执行状态
+5. 检查 GitHub Issues 或创建新 Issue
