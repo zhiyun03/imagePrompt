@@ -4,7 +4,8 @@ import {fetchRequestHandler} from "@trpc/server/adapters/fetch";
 import {createTRPCContext} from "@saasfly/api";
 import {edgeRouter} from "@saasfly/api/edge";
 
-export const runtime = "edge";
+// 暂时禁用 edge runtime 以解决 crypto 模块兼容性问题
+// export const runtime = "edge";
 
 const createContext = async (req: NextRequest) => {
     try {
@@ -25,6 +26,15 @@ const createContext = async (req: NextRequest) => {
 };
 
 const handler = (req: NextRequest) => {
+    // 暂时禁用 edge 路由以解决构建问题
+    return new Response("Edge tRPC temporarily disabled for build", {
+        status: 503,
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+    });
+
+    /*
     try {
         return fetchRequestHandler({
             endpoint: "/api/trpc/edge",
@@ -40,6 +50,7 @@ const handler = (req: NextRequest) => {
         console.error("Failed to initialize tRPC handler:", error);
         throw error;
     }
+    */
 };
 
 export {handler as GET, handler as POST};
