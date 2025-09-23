@@ -2,17 +2,7 @@
   "github": {
     "silent": true
   },
-  "builds": [
-    {
-      "src": "apps/nextjs/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/auth/(.*)",
-      "dest": "/api/auth/$1"
-    }
-  ],
-  "outputDirectory": "apps/nextjs/.next/standalone"
+  "buildCommand": "cd apps/nextjs && bun run build",
+  "outputDirectory": "apps/nextjs/.next",
+  "installCommand": "bun install"
 }
