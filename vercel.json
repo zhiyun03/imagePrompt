@@ -1,4 +1,4 @@
 {
-  "buildCommand": "cd apps/nextjs && bun run build",
+  "buildCommand": "./vercel-build.sh",
   "outputDirectory": "apps/nextjs/.next"
 }
