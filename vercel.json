@@ -9,11 +9,5 @@
   },
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
-  },
-  "builds": [
-    {
-      "src": "apps/nextjs/package.json",
-      "use": "@vercel/next"
-    }
-  ]
+  }
 }
