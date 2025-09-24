@@ -1,15 +1,13 @@
 // @ts-check
-import "./src/env.mjs";
-import "@saasfly/auth/env.mjs";
-
 import { withNextDevtools } from "@next-devtools/core/plugin";
 // import "@saasfly/api/env"
 import withMDX from "@next/mdx";
 
 // Skip env validation in Vercel build environment
-!process.env.SKIP_ENV_VALIDATION && 
-!process.env.VERCEL && 
-(await import("./src/env.mjs"));
+if (!process.env.SKIP_ENV_VALIDATION && !process.env.VERCEL) {
+  await import("./src/env.mjs");
+  await import("@saasfly/auth/env.mjs");
+}
 
 /** @type {import("next").NextConfig} */
 const config = {
