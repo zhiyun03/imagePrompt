@@ -1,6 +1,6 @@
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { withAuth } from "next-auth/middleware";
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import Negotiator from "negotiator";
 
 import { i18n } from "~/config/i18n-config";
@@ -9,6 +9,52 @@ import { env } from "~/env.mjs";
 const noNeedProcessRoute = [".*\\.png", ".*\\.jpg", ".*\\.opengraph-image.png"];
 
 const noRedirectRoute = ["/api(.*)", "/trpc(.*)", "/admin", "/api/coze(.*)"];
+
+const SESSION_COOKIE_NAMES = ["__Secure-next-auth.session-token", "next-auth.session-token"] as const;
+
+const getSessionToken = (req: NextRequest) => {
+  for (const name of SESSION_COOKIE_NAMES) {
+    const value = req.cookies.get(name)?.value;
+    if (value) {
+      return value;
+    }
+  }
+  return null;
+};
+
+function hasSessionToken(req: NextRequest | { cookies: NextRequest["cookies"] }) {
+  return SESSION_COOKIE_NAMES.some((name) => !!req.cookies.get(name)?.value);
+}
+
+async function resolveAuthState(req: NextRequest) {
+  const token = req.nextauth.token;
+  if (token) {
+    return {
+      isAuth: true,
+      token,
+      sessionToken: null as string | null,
+      userEmail: token.email ?? null,
+    } as const;
+  }
+
+  const sessionToken = getSessionToken(req);
+  if (!sessionToken) {
+    return {
+      isAuth: false,
+      token: null,
+      sessionToken: null,
+      userEmail: null,
+    } as const;
+  }
+
+  // 在 middleware/edge 环境不再调用 adapter，避免引入 openid-client 等依赖导致 substring 报错
+  return {
+    isAuth: !!sessionToken, // 仅凭 cookie 粗略判断
+    token: null,
+    sessionToken,
+    userEmail: null,
+  } as const;
+}
 
 const isPublicRoute = (pathname: string) => {
   const publicRoutes = [
@@ -23,7 +69,7 @@ const isPublicRoute = (pathname: string) => {
     new RegExp("^/\\w{2}$"), // root with locale
     new RegExp("^/$"), // root without locale
   ];
-  return publicRoutes.some(route => route.test(pathname));
+  return publicRoutes.some((route) => route.test(pathname));
 };
 
 export function getLocale(request: NextRequest): string | undefined {
@@ -46,8 +92,15 @@ export function isNoNeedProcess(request: NextRequest): boolean {
 
 export default withAuth(
   async function middleware(req: NextRequest) {
+    if (req.nextUrl.pathname.startsWith("/api/auth")) {
+      return NextResponse.next();
+    }
+
     // Skip middleware for our API routes to avoid authentication issues
-    if (req.nextUrl.pathname.startsWith("/api/coze/") || req.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    if (
+      req.nextUrl.pathname.startsWith("/api/coze/") ||
+      req.nextUrl.pathname.startsWith("/api/webhooks/")
+    ) {
       return NextResponse.next();
     }
 
@@ -57,54 +110,47 @@ export default withAuth(
 
     const pathname = req.nextUrl.pathname;
     const pathnameIsMissingLocale = i18n.locales.every(
-      (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+      (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
     );
 
     if (!isNoRedirect(req) && pathnameIsMissingLocale) {
       const locale = getLocale(req);
       return NextResponse.redirect(
-        new URL(
-          `/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
-          req.url,
-        ),
+        new URL(`/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}`, req.url),
       );
     }
 
-    // 先处理认证页：如果已登录，访问 /{locale}/login|register 则跳转到仪表盘
-    const isAuthPage = /^\/[a-zA-Z]{2,}\/(login|register)/.test(req.nextUrl.pathname);
+    const isAuthPage = /^\/[a-zA-Z]{2,}\/(login|register)/.test(pathname);
+    const authState = await resolveAuthState(req);
+    const isAuth = authState.isAuth;
 
-    const token = req.nextauth.token;
-    const isAuth = !!token;
-    let isAdmin = false;
-
-    if (env.ADMIN_EMAIL && token?.email) {
-      const adminEmails = env.ADMIN_EMAIL.split(",");
-      isAdmin = adminEmails.includes(token.email);
-    }
-
-    // 放到上面提前声明了 isAuthPage
-    const isAuthRoute = req.nextUrl.pathname.startsWith("/api/trpc/");
     const locale = getLocale(req);
 
-    if (isAuthRoute && isAuth) {
+    let isAdmin = false;
+    // admin 判断保持简单，避免边缘环境读取数据库
+    if (env.ADMIN_EMAIL && authState.userEmail) {
+      const adminEmails = env.ADMIN_EMAIL.split(",");
+      isAdmin = adminEmails.includes(authState.userEmail);
+    }
+
+    if (isAuthPage) {
+      if (isAuth && locale) {
+        return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
+      }
       return NextResponse.next();
     }
 
-    if (req.nextUrl.pathname.startsWith("/admin/dashboard")) {
+    if (pathname.startsWith("/admin/dashboard")) {
       if (!isAuth || !isAdmin) {
         return NextResponse.redirect(new URL(`/admin/login`, req.url));
       }
       return NextResponse.next();
     }
 
-    if (isAuthPage) {
-      if (isAuth) {
-        return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
-      }
-      return NextResponse.next();
+    if (pathname.startsWith("/api/trpc/")) {
+      return isAuth ? NextResponse.next() : NextResponse.redirect(new URL(`/api/auth/error`, req.url));
     }
 
-    // 其余公共路由直接放行
     if (isPublicRoute(pathname)) {
       return NextResponse.next();
     }
@@ -114,9 +160,9 @@ export default withAuth(
       if (req.nextUrl.search) {
         from += req.nextUrl.search;
       }
-      return NextResponse.redirect(
-        new URL(`/${locale}/login?from=${encodeURIComponent(from)}`, req.url),
-      );
+      const redirectUrl = new URL(`/${locale ?? i18n.defaultLocale}/login`, req.url);
+      redirectUrl.searchParams.set("from", from);
+      return NextResponse.redirect(redirectUrl);
     }
 
     return NextResponse.next();
@@ -125,18 +171,25 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname;
+        const isAuthPage = /^\/[a-zA-Z]{2,}\/(login|register)/.test(pathname);
+        const hasCookie = hasSessionToken(req as NextRequest);
 
-        // Skip auth check for our API routes
+        if (pathname.startsWith("/api/auth")) {
+          return true;
+        }
+
         if (pathname.startsWith("/api/coze/") || pathname.startsWith("/api/webhooks/")) {
           return true;
         }
 
-        // Allow public routes
         if (isPublicRoute(pathname)) {
           return true;
         }
 
-        // Admin routes
+        if (isAuthPage) {
+          return true;
+        }
+
         if (pathname.startsWith("/admin/dashboard")) {
           if (env.ADMIN_EMAIL && token?.email) {
             const adminEmails = env.ADMIN_EMAIL.split(",");
@@ -145,16 +198,14 @@ export default withAuth(
           return false;
         }
 
-        // Auth routes
         if (pathname.startsWith("/api/trpc/")) {
-          return !!token;
+          return !!token || hasCookie;
         }
 
-        // Protected routes
-        return !!token;
+        return !!token || hasCookie;
       },
     },
-  }
+  },
 );
 
 export const config = {
@@ -162,6 +213,6 @@ export const config = {
     "/((?!.*\\..*|_next).*)",
     "/",
     "/(api|trpc)(.*)",
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)"
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
   ],
 };

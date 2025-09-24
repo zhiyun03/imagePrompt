@@ -6,11 +6,14 @@ import { MagicLinkEmail, resend, siteConfig } from "@saasfly/common";
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 
 import { env } from "./env.mjs";
+import { KyselyAdapter } from "@auth/kysely-adapter";
+import { adapterDb } from "./db";
 
 // 为openid-client设置代理
 import { HttpsProxyAgent } from "https-proxy-agent";
 import * as https from "https";
 import * as http from "http";
+import type { Adapter } from "next-auth/adapters";
 
 type UserId = string;
 type IsAdmin = boolean;
@@ -48,11 +51,9 @@ if (typeof window === 'undefined') {
     // 创建代理agent
     const proxyAgent = new HttpsProxyAgent(proxyUrl);
 
-    // 直接替换全局HTTPS agent
-    https.globalAgent = proxyAgent;
-
-    // 直接替换全局HTTP agent  
-    http.globalAgent = new HttpsProxyAgent(proxyUrl);
+    // 直接替换全局代理（通过类型断言规避只读类型限制）
+    (https as any).globalAgent = proxyAgent;
+    (http as any).globalAgent = new HttpsProxyAgent(proxyUrl);
     
     console.log('✅ Global agents replaced with proxy agents');
     console.log('🔗 All HTTPS requests will now use proxy:', proxyUrl);
@@ -69,9 +70,9 @@ if (typeof window === 'undefined') {
 }
 
 export const authOptions: NextAuthOptions = {
-  // adapter: KyselyAdapter(db), // 暂时禁用适配器，先确保基本登录功能工作
+  adapter: KyselyAdapter(adapterDb) as unknown as Adapter,
   session: {
-    strategy: "jwt",
+    strategy: "database",
   },
   pages: {
     signIn: "/login",
@@ -130,30 +131,25 @@ export const authOptions: NextAuthOptions = {
       // 登录成功后重定向到主页（落地页）
       return `${baseUrl}/zh`;
     },
-    async session({ token, session }) {
-      if (token && session.user) {
-        session.user.id = token.sub as string;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.image = token.picture;
-        session.user.isAdmin = token.isAdmin as boolean;
+    async session({ session, user }) {
+      if (session.user) {
+        // database 策略下从 user 注入字段
+        if (user) {
+          session.user.id = (user as any).id as string;
+          session.user.name = user.name;
+          session.user.email = user.email;
+          session.user.image = user.image;
+        }
+
+        let isAdmin = false;
+        if (env.ADMIN_EMAIL && session.user?.email) {
+          const adminEmails = env.ADMIN_EMAIL.split(",");
+          isAdmin = adminEmails.includes(session.user.email);
+        }
+        session.user.isAdmin = isAdmin;
       }
       console.log('📊 Session callback result:', { session: session.user });
       return session;
-    },
-    async jwt({ token, user }) {
-      const email = token?.email ?? "";
-
-      let isAdmin = false;
-      if (env.ADMIN_EMAIL && email) {
-        const adminEmails = env.ADMIN_EMAIL.split(",");
-        isAdmin = adminEmails.includes(email);
-      }
-
-      return {
-        ...token,
-        isAdmin: isAdmin,
-      };
     },
   },
   debug: true, // 临时启用调试模式

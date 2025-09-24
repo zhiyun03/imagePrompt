@@ -12,7 +12,7 @@ import { MainNav } from "./main-nav";
 import { LocaleChange } from "~/components/locale-change";
 import { GitHubStar } from "~/components/github-star";
 import { useSigninModal } from "~/hooks/use-signin-modal";
-import { UserAccountNav } from "./user-account-nav";
+import { UserAccountNavClient } from "./user-account-nav-client";
 
 import useScroll from "~/hooks/use-scroll";
 import type { MainNavItem } from "~/types";
@@ -95,7 +95,7 @@ export function NavBar({
           ) : null}
 
           {user ? (
-            <UserAccountNav
+            <UserAccountNavClient
               user={user}
               params={{ lang: `${lang}` }}
               dict={dropdown}

@@ -6,10 +6,15 @@ export async function GET() {
     return new Response('Not available in production', { status: 403 });
   }
   
+  const safeSub = (val: unknown, len = 10) => {
+    if (typeof val === 'string') return `${val.substring(0, len)}...`;
+    return '未设置';
+  };
+
   const envInfo = {
-    GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ? `${env.GOOGLE_CLIENT_ID.substring(0, 10)}...` : '未设置',
+    GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID ? safeSub(env.GOOGLE_CLIENT_ID, 10) : '未设置',
     GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET ? '已设置(隐藏)' : '未设置',
-    NEXTAUTH_URL: env.NEXTAUTH_URL,
+    NEXTAUTH_URL: env.NEXTAUTH_URL || '未设置',
     NEXTAUTH_SECRET: env.NEXTAUTH_SECRET ? '已设置(隐藏)' : '未设置',
   };
   
