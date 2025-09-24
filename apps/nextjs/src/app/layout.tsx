@@ -64,11 +64,11 @@ export const metadata = {
     siteName: siteConfig.name,
   },
   icons: {
-    icon: "/logo.svg",
-    // shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.svg",
   },
-  metadataBase: new URL("https://show.saasfly.io/"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   // manifest: `${siteConfig.url}/site.webmanifest`,
 };
 
