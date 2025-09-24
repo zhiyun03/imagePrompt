@@ -45,7 +45,9 @@ export default async function LoginPage({
             className="mx-auto"
             width="64"
             height="64"
-            alt=""
+            alt="Saasfly Logo"
+            priority
+            unoptimized
           />
           <h1 className="text-2xl font-semibold tracking-tight">
             {dict.login.welcome_back}

@@ -25,7 +25,9 @@ export const SignInModal = ({ dict }: { dict: Record<string, string> }) => {
               className="mx-auto"
               width="64"
               height="64"
-              alt=""
+              alt="Saasfly Logo"
+              priority
+              unoptimized
             />
           </a>
           <h3 className="font-urban text-2xl font-bold">{dict.signup}</h3>
