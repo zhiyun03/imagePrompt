@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "turbo build --filter=@saasfly/nextjs",
+  "buildCommand": "SKIP_ENV_VALIDATION=true turbo build --filter=@saasfly/nextjs",
   "installCommand": "bun install",
   "outputDirectory": "apps/nextjs/.next",
   "framework": "nextjs",

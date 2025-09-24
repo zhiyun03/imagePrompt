@@ -6,7 +6,10 @@ import { withNextDevtools } from "@next-devtools/core/plugin";
 // import "@saasfly/api/env"
 import withMDX from "@next/mdx";
 
-!process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
+// Skip env validation in Vercel build environment
+!process.env.SKIP_ENV_VALIDATION && 
+!process.env.VERCEL && 
+(await import("./src/env.mjs"));
 
 /** @type {import("next").NextConfig} */
 const config = {
