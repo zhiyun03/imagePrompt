@@ -12,7 +12,7 @@ const noRedirectRoute = ["/api(.*)", "/trpc(.*)", "/admin", "/api/coze(.*)"];
 
 const isPublicRoute = (pathname: string) => {
   const publicRoutes = [
-    new RegExp("/(\\w{2}/)?login(.*)"),
+    // 注意: login 不作为公共路由放行，避免已登录时访问 /login 被提前 next()
     new RegExp("/(\\w{2}/)?register(.*)"),
     new RegExp("/(\\w{2}/)?terms(.*)"),
     new RegExp("/(\\w{2}/)?privacy(.*)"),
@@ -70,9 +70,8 @@ export default withAuth(
       );
     }
 
-    if (isPublicRoute(pathname)) {
-      return NextResponse.next();
-    }
+    // 先处理认证页：如果已登录，访问 /{locale}/login|register 则跳转到仪表盘
+    const isAuthPage = /^\/[a-zA-Z]{2,}\/(login|register)/.test(req.nextUrl.pathname);
 
     const token = req.nextauth.token;
     const isAuth = !!token;
@@ -83,7 +82,7 @@ export default withAuth(
       isAdmin = adminEmails.includes(token.email);
     }
 
-    const isAuthPage = /^\/[a-zA-Z]{2,}\/(login|register)/.test(req.nextUrl.pathname);
+    // 放到上面提前声明了 isAuthPage
     const isAuthRoute = req.nextUrl.pathname.startsWith("/api/trpc/");
     const locale = getLocale(req);
 
@@ -102,6 +101,11 @@ export default withAuth(
       if (isAuth) {
         return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
       }
+      return NextResponse.next();
+    }
+
+    // 其余公共路由直接放行
+    if (isPublicRoute(pathname)) {
       return NextResponse.next();
     }
 

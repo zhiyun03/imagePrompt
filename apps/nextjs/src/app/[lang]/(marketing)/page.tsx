@@ -53,50 +53,8 @@ export default async function IndexPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 fixed w-full top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <span className="text-purple-600 text-xl font-bold">ImagePrompt.org</span>
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.home}</button>
-              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.inspiration}</button>
-              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.tutorials}</button>
-              <div className="relative group">
-                <button className="text-gray-700 hover:text-purple-600 font-medium flex items-center">
-                  {dict.marketing.tools}
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              </div>
-              <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.main_nav_pricing}</button>
-            </div>
-
-            {/* Right Side */}
-            <div className="flex items-center space-x-4">
-              <Link href={`/${lang}/login`}>
-                <button className="text-gray-700 hover:text-purple-600 font-medium">{dict.marketing.login}</button>
-              </Link>
-              <div className="text-sm text-gray-600">
-                {lang === 'zh' ? (
-                  <>Switch to English? <Link href="/en" className="text-purple-600 cursor-pointer hover:underline">YES</Link></>
-                ) : (
-                  <>切换到简体中文? <Link href="/zh" className="text-purple-600 cursor-pointer hover:underline">YES</Link></>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+      <section className="pt-20 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             {dict.marketing.create_better_ai_art}
