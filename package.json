@@ -2,6 +2,7 @@
   "name": "nextjs-template",
   "devDependencies": {
     "@turbo/gen": "1.13.3",
+    "@types/node": "^24.5.2",
     "check-dependency-version-consistency": "4.1.0",
     "prettier": "3.2.5",
     "tailwind-config-viewer": "^2.0.4",
@@ -37,7 +38,13 @@
   ],
   "dependencies": {
     "@auth/kysely-adapter": "1.10.0",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^15.5.4",
+    "dotenv": "^17.2.2",
+    "https-proxy-agent": "^7.0.6",
     "lucide-react": "^0.544.0",
-    "next-auth": "4.24.7"
+    "next-auth": "4.24.7",
+    "openid-client": "^6.8.0"
   }
 }

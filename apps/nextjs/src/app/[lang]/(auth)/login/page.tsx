@@ -12,8 +12,8 @@ import type { Locale } from "~/config/i18n-config";
 import { getDictionary } from "~/lib/get-dictionary";
 
 export const metadata: Metadata = {
-  title: "Login",
-  description: "Login to your account",
+  title: "ImagePrompt Login",
+  description: "Login to your ImagePrompt account",
 };
 
 export default async function LoginPage({
@@ -41,11 +41,11 @@ export default async function LoginPage({
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <Image
-            src="/images/avatars/saasfly-logo.svg"
+            src="/logo.svg"
             className="mx-auto"
             width="64"
             height="64"
-            alt="Saasfly Logo"
+            alt="ImagePrompt Logo"
             priority
             unoptimized
           />

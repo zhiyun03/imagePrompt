@@ -21,11 +21,11 @@ export const SignInModal = ({ dict }: { dict: Record<string, string> }) => {
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-neutral-200 dark:border-neutral-800 bg-background px-4 py-6 pt-8 text-center md:px-16">
           <a href={siteConfig.url}>
             <Image
-              src="/images/avatars/saasfly-logo.svg"
+              src="/logo.svg"
               className="mx-auto"
               width="64"
               height="64"
-              alt="Saasfly Logo"
+              alt="ImagePrompt Logo"
               priority
               unoptimized
             />
@@ -38,25 +38,34 @@ export const SignInModal = ({ dict }: { dict: Record<string, string> }) => {
           <Button
             variant="default"
             disabled={signInClicked}
-            onClick={() => {
+            onClick={async () => {
               setSignInClicked(true);
-              signIn("github", { redirect: false })
-                .then(() =>
+              try {
+                console.log("Starting Google sign in from modal...");
+                const result = await signIn("google", { redirect: false });
+                console.log("Modal Google sign in result:", result);
+                
+                if (result?.error) {
+                  console.error("Modal Google signIn error:", result.error);
+                } else if (result?.url) {
+                  window.location.href = result.url;
+                } else {
                   setTimeout(() => {
                     signInModal.onClose();
-                  }, 1000),
-                )
-                .catch((error) => {
-                  console.error("signUp failed:", error);
-                });
+                  }, 1000);
+                }
+              } catch (error) {
+                console.error("Modal signUp failed:", error);
+              }
+              setSignInClicked(false);
             }}
           >
             {signInClicked ? (
               <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Icons.GitHub className="mr-2 h-4 w-4" />
+              <Icons.Google className="mr-2 h-4 w-4" />
             )}{" "}
-            {dict.signup_github}
+            使用 Google 登录
           </Button>
         </div>
       </div>

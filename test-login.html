@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 登录测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #357ae8; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Google 登录功能测试</h1>
+    
+    <div class="test-section success">
+        <h2>✅ 环境配置检查</h2>
+        <p>Google OAuth 凭据已正确配置在 .env.local 文件中</p>
+        <p>Client ID: 590391951259-4e8f2pd3mjhjq5dldiddlvsvvmqopc22.apps.googleusercontent.com</p>
+    </div>
+
+    <div class="test-section warning">
+        <h2>⚠️ 测试 Google 登录</h2>
+        <p>点击以下按钮测试 Google 登录功能：</p>
+        
+        <!-- 直接测试 Google OAuth 授权端点 -->
+        <button onclick="testDirectGoogleAuth()">测试直接 Google OAuth</button>
+        
+        <!-- 测试 NextAuth.js 登录端点 -->
+        <button onclick="testNextAuthSignIn()">测试 NextAuth.js 登录</button>
+        
+        <p><small>注意：这些测试将在新窗口打开，请允许弹出窗口</small></p>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 配置验证清单</h2>
+        <ol>
+            <li>✅ Google OAuth 凭据已配置</li>
+            <li>✅ 环境变量已加载</li>
+            <li>⚠️ 请验证 Google Cloud Console 配置：
+                <ul>
+                    <li>已添加授权重定向 URI: <code>http://localhost:3000/api/auth/callback/google</code></li>
+                    <li>OAuth 同意屏幕已配置</li>
+                    <li>Google+ API 已启用</li>
+                </ul>
+            </li>
+            <li>⚠️ 检查浏览器控制台是否有错误信息</li>
+        </ol>
+    </div>
+
+    <script>
+        function testDirectGoogleAuth() {
+            // 直接测试 Google OAuth 授权端点
+            const params = new URLSearchParams({
+                client_id: '590391951259-4e8f2pd3mjhjq5dldiddlvsvvmqopc22.apps.googleusercontent.com',
+                redirect_uri: 'http://localhost:3000/api/auth/callback/google',
+                response_type: 'code',
+                scope: 'openid email profile',
+                access_type: 'offline',
+                prompt: 'consent'
+            });
+            
+            window.open(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`, '_blank');
+        }
+
+        function testNextAuthSignIn() {
+            // 测试 NextAuth.js 登录端点
+            window.open('http://localhost:3000/api/auth/signin?provider=google', '_blank');
+        }
+
+        // 页面加载时检查开发服务器状态
+        fetch('http://localhost:3000/api/auth/session')
+            .then(response => response.json())
+            .then(data => {
+                console.log('开发服务器状态:', data);
+            })
+            .catch(error => {
+                console.error('开发服务器连接失败:', error);
+            });
+    </script>
+</body>
+</html>

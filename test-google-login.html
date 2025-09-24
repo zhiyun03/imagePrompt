@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Google OAuth 登录测试</h1>
+        
+        <h3>测试步骤：</h3>
+        <ol>
+            <li>点击下面的按钮测试不同的Google登录方式</li>
+            <li>观察日志输出</li>
+            <li>检查是否能跳转到Google认证页面</li>
+        </ol>
+
+        <button onclick="testDirectRedirect()">方法1: 直接重定向到Google OAuth</button>
+        <button onclick="testNextAuthAPI()">方法2: 测试NextAuth API</button>
+        <button onclick="testWithoutProxy()">方法3: 测试无代理连接</button>
+        
+        <div id="log" class="log">准备开始测试...\n</div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            if (className) {
+                logDiv.innerHTML = logDiv.innerHTML.replace(message, `<span class="${className}">${message}</span>`);
+            }
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // 方法1: 直接重定向到Google OAuth
+        function testDirectRedirect() {
+            log('开始测试方法1: 直接重定向');
+            
+            // 构建Google OAuth URL
+            const clientId = '590391951259-4e8f2pd3mjhjq5dldiddlvsvvmqopc22.apps.googleusercontent.com';
+            const redirectUri = 'http://localhost:3000/api/auth/callback/google';
+            const scope = 'openid email profile';
+            const responseType = 'code';
+            const state = 'test-state-' + Math.random().toString(36).substring(7);
+            
+            const oauthUrl = `https://accounts.google.com/oauth/authorize?` +
+                `client_id=${encodeURIComponent(clientId)}&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                `scope=${encodeURIComponent(scope)}&` +
+                `response_type=${encodeURIComponent(responseType)}&` +
+                `state=${encodeURIComponent(state)}&` +
+                `prompt=consent&` +
+                `access_type=offline`;
+            
+            log(`构建的OAuth URL: ${oauthUrl}`);
+            log('即将跳转到Google认证页面...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = oauthUrl;
+            }, 2000);
+        }
+
+        // 方法2: 测试NextAuth API
+        async function testNextAuthAPI() {
+            log('开始测试方法2: NextAuth API');
+            
+            try {
+                // 测试providers
+                log('1. 测试 /api/auth/providers');
+                const providersResponse = await fetch('/api/auth/providers');
+                const providers = await providersResponse.json();
+                log(`Providers响应: ${JSON.stringify(providers, null, 2)}`, 'success');
+                
+                // 测试csrf
+                log('2. 测试 /api/auth/csrf');
+                const csrfResponse = await fetch('/api/auth/csrf');
+                const csrf = await csrfResponse.json();
+                log(`CSRF响应: ${JSON.stringify(csrf, null, 2)}`, 'success');
+                
+                // 测试Google signin
+                log('3. 测试 /api/auth/signin/google');
+                const signinResponse = await fetch('/api/auth/signin/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `csrfToken=${csrf.csrfToken}`
+                });
+                
+                log(`Signin状态码: ${signinResponse.status}`);
+                
+                if (signinResponse.redirected) {
+                    log(`重定向到: ${signinResponse.url}`, 'success');
+                    setTimeout(() => {
+                        window.location.href = signinResponse.url;
+                    }, 2000);
+                } else {
+                    const signinText = await signinResponse.text();
+                    log(`Signin响应: ${signinText.substring(0, 200)}...`);
+                }
+                
+            } catch (error) {
+                log(`API测试错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 方法3: 测试无代理连接
+        function testWithoutProxy() {
+            log('开始测试方法3: 检查网络连接');
+            
+            // 测试能否访问Google
+            const img = new Image();
+            img.onload = () => {
+                log('✅ 可以访问Google服务器', 'success');
+                testDirectRedirect();
+            };
+            img.onerror = () => {
+                log('❌ 无法访问Google服务器，可能是网络或代理问题', 'error');
+                log('建议检查代理设置或网络连接');
+            };
+            img.src = 'https://www.google.com/favicon.ico?' + Date.now();
+        }
+
+        // 页面加载时的初始化
+        log('页面加载完成，准备测试Google OAuth功能');
+        log('当前页面URL: ' + window.location.href);
+        log('可用的测试方法: 3种');
+    </script>
+</body>
+</html>

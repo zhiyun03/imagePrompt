@@ -43,7 +43,7 @@ export function UserAuthForm({
     resolver: zodResolver(userAuthSchema),
   });
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const searchParams = useSearchParams();
 
   async function onSubmit(data: FormData) {
@@ -88,7 +88,7 @@ export function UserAuthForm({
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading || isGitHubLoading || disabled}
+              disabled={isLoading || isGoogleLoading || disabled}
               {...register("email")}
             />
             {errors?.email && (
@@ -120,20 +120,66 @@ export function UserAuthForm({
       <button
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsGitHubLoading(true);
-          signIn("github").catch((error) => {
-            console.error("GitHub signIn error:", error);
-          });
+        onClick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          console.log("🔴 Google button clicked!");
+          console.log("🔴 signIn function available:", typeof signIn);
+
+          setIsGoogleLoading(true);
+
+          try {
+            console.log("🔴 Starting Google sign in...");
+
+            // 使用正确的callbackUrl进行Google登录 - 重定向到主页
+            const callbackUrl = searchParams?.get("from") ?? `/${lang}`;
+            console.log("🔴 CallbackUrl will be:", callbackUrl);
+
+            // 使用redirect: false来获取结果
+            const result = await signIn("google", {
+              callbackUrl: callbackUrl,
+              redirect: false,
+            });
+
+            console.log("🔴 Google sign in result:", result);
+
+            if (result?.error) {
+              console.error("🔴 Google sign in error:", result.error);
+              throw new Error(result.error);
+            }
+
+            if (result?.url) {
+              console.log("🔴 Redirecting to:", result.url);
+              window.location.href = result.url;
+            } else {
+              console.log("🔴 No redirect URL, assuming success");
+              // 如果没有URL但也没有错误，可能是session已经更新
+              setTimeout(() => {
+                window.location.href = callbackUrl;
+              }, 1000);
+            }
+
+          } catch (error) {
+            console.error("🔴 Catch block error:", error);
+            toast({
+              title: "Google登录失败",
+              description: error.message || "请稍后重试",
+              variant: "destructive",
+            });
+          } finally {
+            console.log("🔴 Finally block executed");
+            setIsGoogleLoading(false);
+          }
         }}
-        disabled={isLoading || isGitHubLoading}
+        disabled={isLoading || isGoogleLoading || disabled}
       >
-        {isGitHubLoading ? (
+        {isGoogleLoading ? (
           <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
         ) : (
-          <Icons.GitHub className="mr-2 h-4 w-4" />
+          <Icons.Google className="mr-2 h-4 w-4" />
         )}{" "}
-        Github
+        Google
       </button>
     </div>
   );

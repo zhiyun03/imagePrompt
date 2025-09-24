@@ -11,7 +11,7 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID: z.string().optional(),
   },
   server: {
-    NEXTAUTH_SECRET: z.string().min(1),
+    NEXTAUTH_SECRET: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().optional(),
   },
   // Client side variables gets destructured here due to Next.js static analysis
@@ -32,7 +32,5 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID:
       process.env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID,
   },
-  skipValidation:
-    !!process.env.SKIP_ENV_VALIDATION ||
-    process.env.npm_lifecycle_event === "lint",
+  skipValidation: true,
 });

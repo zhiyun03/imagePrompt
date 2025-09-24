@@ -14,6 +14,8 @@
     "@auth/kysely-adapter": "1.10.0",
     "@saasfly/db": "workspace:*",
     "@t3-oss/env-nextjs": "0.8.0",
+    "kysely": "^0.27.3",
+    "pg": "^8.11.3",
     "next": "14.2.5",
     "next-auth": "4.24.7",
     "react": "18.3.1",
@@ -24,6 +26,7 @@
     "@saasfly/eslint-config": "workspace:*",
     "@saasfly/prettier-config": "workspace:*",
     "@saasfly/typescript-config": "workspace:*",
+    "@types/pg": "^8.11.0",
     "eslint": "8.57.0",
     "prettier": "3.2.5",
     "typescript": "5.4.5"
